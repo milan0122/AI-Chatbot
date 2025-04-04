@@ -51,13 +51,16 @@ def get_next_order_id():
     
 def insert_order_item(food_item, quantity,order_id):
     try:
-        #calling stored procedure
-        cursor = cnx.cursor('insert_order_item',(food_item,quantity,order_id))
+
+        cursor = cnx.cursor()
+        # Calling the stored procedure
+        cursor.callproc('insert_order_item', (food_item, quantity, order_id))
 
         cnx.commit()
 
         cursor.close()
         print("Order item inserted successfully !")
+
     except mysql.connector.Error as err:
        print(f"Error due to :{err}")
 
