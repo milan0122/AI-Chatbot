@@ -34,4 +34,53 @@ def get_order_status(order_id):
         return None
 
 
+def get_next_order_id():
+
+    cursor = cnx.cursor()
+    query = "Select Max(order_id) from orders"
+    cursor.execute(query)
+
+    result = cursor.fetchone()[0]
+
+    cursor.close()
+    
+    if result is None:
+        return 1
+    else: 
+        return result + 1 
+    
+def insert_order_item(food_item, quantity,order_id):
+    try:
+        #calling stored procedure
+        cursor = cnx.cursor('insert_order_item',(food_item,quantity,order_id))
+
+        cnx.commit()
+
+        cursor.close()
+        print("Order item inserted successfully !")
+    except mysql.connector.Error as err:
+       print(f"Error due to :{err}")
+
+       #roolback
+       cnx.rollback()
+       return -1
+    except Exception as e:
+        print(f"error due to {e}")
+        cnx.rollback()
+        return -1
+    
+def get_total_order_price(order_id):
+
+    cursor = cnx.cursor()
+
+    query = f"Select get_total_order_price({order_id})"
+    cursor.execute(query)
+
+    # fetching the result 
+    result = cursor.fetchone()[0]
+
+    #closing 
+    cursor.close()
+    return result
+        
 

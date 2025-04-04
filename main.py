@@ -63,3 +63,35 @@ def track_order(parameters:dict):
     return JSONResponse(content={
         "fulfillmentText": fulfillment_text
     })
+
+def complete_order(parameters:dict,session_id:str):
+    if session_id not in inprogress_order:
+        fullfillment_text = "I'm having in trouble finding your order. Sorry! can you place order again"
+    else:
+        order = inprogress_order[session_id]
+        order_id = save_to_db(order)
+
+        if order_id == -1:
+            fullfillment_text = "Sorry, I coudn't process your order due to some errors." \
+                                "Please palce a new order again "
+            
+        else:
+            fullfillment_text = f"Awesome. We have placed your order"\
+                                f"Here is your order id # {order_id}"\
+                                f"your order total is {order_total} and you have to pay when you recieve order"
+def save_to_db(order:dict):
+    #taking next order_id 
+    next_order_id = db_helper.get_next_order_id()
+    # adding item to db
+    for item,qty in order.items():
+       rcode =  db_helper.insert_order_item(
+            item,
+            qty,
+            next_order_id
+        )
+       
+       if rcode == -1:
+           return -1
+       else:
+           order_total = db_helper.get_total_order_price(next_order_id)
+    return next_order_id,order_total
