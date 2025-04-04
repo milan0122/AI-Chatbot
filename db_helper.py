@@ -83,4 +83,15 @@ def get_total_order_price(order_id):
     cursor.close()
     return result
         
+def insert_order_tracking(order_id,status):
+    cursor = cnx.cursor()
 
+    # Inserting the record into the order_tracking table
+    insert_query = "INSERT INTO order_tracking (order_id, status) VALUES (%s, %s)"
+    cursor.execute(insert_query, (order_id, status))
+
+    # Committing the changes
+    cnx.commit()
+
+    # Closing the cursor
+    cursor.close()
